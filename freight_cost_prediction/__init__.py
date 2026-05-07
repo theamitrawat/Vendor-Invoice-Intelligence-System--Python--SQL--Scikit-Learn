@@ -1,0 +1,1 @@
+"""Freight cost prediction package."""

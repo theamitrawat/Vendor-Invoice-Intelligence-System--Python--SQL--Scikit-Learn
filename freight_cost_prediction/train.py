@@ -3,19 +3,32 @@ import pandas as pd
 
 from pathlib import Path
 
-from data_preprocessing import (
-    load_vendor_invoice_data,
-    preprocess_data,
-    prepare_features,
-    split_data
-)
-
-from model_evaluation import (
-    train_linear_regression,
-    train_decision_tree,
-    train_random_forest,
-    evaluate_model
-)
+try:
+    from .data_preprocessing import (
+        load_vendor_invoice_data,
+        preprocess_data,
+        prepare_features,
+        split_data
+    )
+    from .model_evaluation import (
+        train_linear_regression,
+        train_decision_tree,
+        train_random_forest,
+        evaluate_model
+    )
+except ImportError:
+    from data_preprocessing import (
+        load_vendor_invoice_data,
+        preprocess_data,
+        prepare_features,
+        split_data
+    )
+    from model_evaluation import (
+        train_linear_regression,
+        train_decision_tree,
+        train_random_forest,
+        evaluate_model
+    )
 
 
 def main():
@@ -24,9 +37,10 @@ def main():
     # File & Folder Paths
     # =====================================
 
-    db_path = "Data/inventory.db"
+    project_root = Path(__file__).resolve().parents[1]
+    db_path = project_root / "Data" / "inventory.db"
 
-    model_dir = Path("models")
+    model_dir = project_root / "models"
     model_dir.mkdir(exist_ok=True)
 
     # =====================================

@@ -1,3 +1,5 @@
+import pandas as pd
+
 from sklearn.linear_model import LinearRegression
 from sklearn.tree import DecisionTreeRegressor
 from sklearn.ensemble import RandomForestRegressor
@@ -105,7 +107,12 @@ def predict_freight_cost(
     Predict freight cost for new invoice data.
     """
 
-    invoice_data = [[quantity, dollars]]
+    invoice_data = pd.DataFrame(
+        {
+            "Quantity": [quantity],
+            "Dollars": [dollars]
+        }
+    )
 
     prediction = model.predict(invoice_data)[0]
 

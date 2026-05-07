@@ -1,12 +1,18 @@
 import sqlite3
 import pandas as pd
 from sklearn.model_selection import train_test_split
+from pathlib import Path
 
 
 def load_vendor_invoice_data(db_path: str) -> pd.DataFrame:
     """
     Load vendor invoice data from SQLite database.
     """
+    db_path = Path(db_path)
+    
+    if not db_path.exists():
+        raise FileNotFoundError(f"Database not found at {db_path}")
+    
     conn = sqlite3.connect(db_path)
 
     query = """

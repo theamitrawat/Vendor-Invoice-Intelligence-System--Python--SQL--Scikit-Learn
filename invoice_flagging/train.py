@@ -1,16 +1,28 @@
-from data_preprocessing import (
-    load_invoice_data,
-    apply_labels,
-    split_data,
-    scale_features
-)
-
-from modeling_evaluation import (
-    train_random_forest,
-    evaluate_classifier
-)
-
+from pathlib import Path
 import joblib
+
+try:
+    from .data_preprocessing import (
+        load_invoice_data,
+        apply_labels,
+        split_data,
+        scale_features
+    )
+    from .modeling_evaluation import (
+        train_random_forest,
+        evaluate_classifier
+    )
+except ImportError:
+    from data_preprocessing import (
+        load_invoice_data,
+        apply_labels,
+        split_data,
+        scale_features
+    )
+    from modeling_evaluation import (
+        train_random_forest,
+        evaluate_classifier
+    )
 
 
 FEATURES = [
@@ -26,6 +38,17 @@ TARGET = "flag_invoice"
 
 def main():
 
+    # =====================================
+    # File & Folder Paths
+    # =====================================
+    
+    project_root = Path(__file__).resolve().parents[1]
+    model_dir = project_root / "models"
+    model_dir.mkdir(exist_ok=True)
+    
+    scaler_path = model_dir / "scaler.pkl"
+    model_path = model_dir / "predict_flag_invoice.pkl"
+
     # Load data
     df = load_invoice_data()
     df = apply_labels(df)
@@ -40,7 +63,7 @@ def main():
     X_train_scaled, X_test_scaled = scale_features(
         X_train,
         X_test,
-        'models/scaler.pkl'
+        str(scaler_path)
     )
 
     # Train and evaluate model
@@ -59,8 +82,12 @@ def main():
     # Save best model
     joblib.dump(
         grid_search.best_estimator_,
-        'models/predict_flag_invoice.pkl'
+        str(model_path)
     )
+    
+    print(f"\nBest model saved successfully.")
+    print(f"Model Path : {model_path}")
+    print(f"Scaler Path: {scaler_path}")
 
 
 if __name__ == "__main__":

@@ -39,6 +39,9 @@ def main():
 
     project_root = Path(__file__).resolve().parents[1]
     db_path = project_root / "Data" / "inventory.db"
+    
+    if not db_path.exists():
+        raise FileNotFoundError(f"Database not found at {db_path}")
 
     model_dir = project_root / "models"
     model_dir.mkdir(exist_ok=True)
@@ -188,7 +191,7 @@ def main():
 
     joblib.dump(
         best_model,
-        model_path
+        str(model_path)
     )
 
     print(f"\nBest model saved successfully.")
@@ -201,7 +204,7 @@ def main():
     results_path = model_dir / "model_results.csv"
 
     results_df.to_csv(
-        results_path,
+        str(results_path),
         index=False
     )
 

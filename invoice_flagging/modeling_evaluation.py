@@ -12,7 +12,8 @@ def train_random_forest(X_train, y_train):
 
     rf = RandomForestClassifier(
         random_state=42,
-        n_jobs=-1
+        n_jobs=-1,
+        class_weight='balanced'
     )
 
     param_grid = {

@@ -2,13 +2,17 @@ import sqlite3
 import pandas as pd
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import StandardScaler
+from pathlib import Path
 import joblib
 
 
 def load_invoice_data():
-    conn = sqlite3.connect(
-        '/Users/ayushimishra/Downloads/Inventory Analysis Project/Inventory-Invoice-Analytics/data/inventory.db'
-    )
+    db_path = Path(__file__).resolve().parents[1] / "Data" / "inventory.db"
+    
+    if not db_path.exists():
+        raise FileNotFoundError(f"Database not found at {db_path}")
+    
+    conn = sqlite3.connect(db_path)
 
     query = """
     WITH purchase_agg AS (
@@ -62,6 +66,9 @@ def create_invoice_risk_label(row):
 
 def apply_labels(df):
 
+    # Handle NaN values before applying labels
+    df = df.dropna(subset=["invoice_dollars", "total_item_dollars", "avg_receiving_delay"])
+    
     df["flag_invoice"] = df.apply(
         create_invoice_risk_label,
         axis=1
@@ -79,7 +86,8 @@ def split_data(df, features, target):
         X,
         y,
         test_size=0.2,
-        random_state=42
+        random_state=42,
+        stratify=y
     )
 
 

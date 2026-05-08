@@ -49,45 +49,59 @@ def main():
     scaler_path = model_dir / "scaler.pkl"
     model_path = model_dir / "predict_flag_invoice.pkl"
 
-    # Load data
-    df = load_invoice_data()
-    df = apply_labels(df)
+    try:
+        # Load data
+        print("Loading invoice data...")
+        df = load_invoice_data()
+        print(f"Data loaded. Shape: {df.shape}")
+        
+        df = apply_labels(df)
+        print(f"Labels applied. Data shape: {df.shape}")
 
-    # Prepare data
-    X_train, X_test, y_train, y_test = split_data(
-        df,
-        FEATURES,
-        TARGET
-    )
+        # Prepare data
+        print("Splitting data...")
+        X_train, X_test, y_train, y_test = split_data(
+            df,
+            FEATURES,
+            TARGET
+        )
+        print(f"Train size: {len(X_train)}, Test size: {len(X_test)}")
 
-    X_train_scaled, X_test_scaled = scale_features(
-        X_train,
-        X_test,
-        str(scaler_path)
-    )
+        print("Scaling features...")
+        X_train_scaled, X_test_scaled = scale_features(
+            X_train,
+            X_test,
+            str(scaler_path)
+        )
 
-    # Train and evaluate model
-    grid_search = train_random_forest(
-        X_train_scaled,
-        y_train
-    )
+        # Train and evaluate model
+        print("Training Random Forest model...")
+        model = train_random_forest(
+            X_train_scaled,
+            y_train
+        )
 
-    evaluate_classifier(
-        grid_search.best_estimator_,
-        X_test_scaled,
-        y_test,
-        "Random Forest Classifier"
-    )
+        evaluate_classifier(
+            model,
+            X_test_scaled,
+            y_test,
+            "Random Forest Classifier"
+        )
 
-    # Save best model
-    joblib.dump(
-        grid_search.best_estimator_,
-        str(model_path)
-    )
-    
-    print(f"\nBest model saved successfully.")
-    print(f"Model Path : {model_path}")
-    print(f"Scaler Path: {scaler_path}")
+        # Save best model
+        print("Saving model...")
+        joblib.dump(
+            model,
+            str(model_path)
+        )
+        
+        print(f"\nBest model saved successfully.")
+        print(f"Model Path : {model_path}")
+        print(f"Scaler Path: {scaler_path}")
+    except Exception as e:
+        print(f"Error during training: {e}")
+        import traceback
+        traceback.print_exc()
 
 
 if __name__ == "__main__":

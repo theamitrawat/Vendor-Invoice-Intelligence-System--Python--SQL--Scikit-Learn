@@ -21,8 +21,7 @@ An end-to-end machine learning system that automates vendor invoice processing w
 
 ## 🚀 **Live Demo**
 
-🔗 **[View Live Application](https://your-app-url.streamlit.app)** *(Replace with your actual Streamlit Cloud URL)*
-
+🔗 **[View Live Application](https://vendor-invoice-intelligence-system-theamitrawat.streamlit.app/)** 
 ---
 
 ## 🛠️ **Tech Stack**
@@ -243,13 +242,11 @@ This project is licensed under the MIT License.
 **Amit Rawat**
 
 - GitHub: [@theamitrawat](https://github.com/theamitrawat)
-- LinkedIn: [Your LinkedIn](https://linkedin.com/in/yourprofile)
+- LinkedIn: [Amit Rawat](https://www.linkedin.com/in/theamitrawat/)
 
 ---
 
 ## 🙏 **Acknowledgments**
-
-- Dataset source: [Mention source if public]
 - Inspired by real-world invoice processing challenges
 - Built with ❤️ using Python & Streamlit
 

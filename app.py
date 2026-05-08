@@ -1149,8 +1149,7 @@ def page_freight_prediction():
                 fig.update_layout(
                     xaxis_title="Invoice Value ($)",
                     yaxis_title="Predicted Freight ($)",
-                    **CHART_THEME, height=200,
-                    margin=dict(l=10, r=10, t=10, b=30),
+                    **{**CHART_THEME, "height": 200, "margin": dict(l=10, r=10, t=10, b=30)},
                 )
                 st.plotly_chart(fig, use_container_width=True)
                 st.markdown("</div>", unsafe_allow_html=True)

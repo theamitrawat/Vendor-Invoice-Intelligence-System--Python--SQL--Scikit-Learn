@@ -91,13 +91,15 @@ def split_data(df, features, target):
     )
 
 
-def scale_features(X_train, X_test, scaler_path='models/scaler.pkl'):
+def scale_features(X_train, X_test, scaler_path=None):
+    """Scale features using StandardScaler and save the scaler."""
+    if scaler_path is None:
+        scaler_path = Path(__file__).resolve().parents[1] / "models" / "scaler.pkl"
 
     scaler = StandardScaler()
-
     X_train_scaled = scaler.fit_transform(X_train)
-    X_test_scaled = scaler.transform(X_test)
+    X_test_scaled  = scaler.transform(X_test)
 
-    joblib.dump(scaler, scaler_path)
+    joblib.dump(scaler, str(scaler_path))
 
     return X_train_scaled, X_test_scaled

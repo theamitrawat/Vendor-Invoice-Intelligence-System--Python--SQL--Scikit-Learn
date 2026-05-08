@@ -568,11 +568,29 @@ def ensure_database():
         with st.spinner("⏳ Downloading database... (first run only, ~400 MB)"):
             response = requests.get(DB_DOWNLOAD_URL, stream=True, timeout=300)
             response.raise_for_status()
+            total = int(response.headers.get("content-length", 0))
+            downloaded = 0
             with open(DB_PATH, "wb") as f:
-                for chunk in response.iter_content(chunk_size=8192):
-                    f.write(chunk)
+                for chunk in response.iter_content(chunk_size=65536):
+                    if chunk:
+                        f.write(chunk)
+                        downloaded += len(chunk)
+        # Verify file is not empty/corrupt
+        if DB_PATH.stat().st_size < 1024:
+            DB_PATH.unlink(missing_ok=True)
+            return False, "Downloaded file appears corrupt (too small)"
         return True, None
+    except requests.exceptions.Timeout:
+        if DB_PATH.exists():
+            DB_PATH.unlink(missing_ok=True)
+        return False, "Download timed out. Please refresh the page to retry."
+    except requests.exceptions.HTTPError as e:
+        if DB_PATH.exists():
+            DB_PATH.unlink(missing_ok=True)
+        return False, f"HTTP error downloading database: {e}"
     except Exception as e:
+        if DB_PATH.exists():
+            DB_PATH.unlink(missing_ok=True)
         return False, str(e)
 
 # Trigger DB download at startup
@@ -643,8 +661,14 @@ def get_db_tables():
 def load_table(table_name):
     """Load any table from the database."""
     try:
+        # Whitelist table names to prevent SQL injection
+        tables, _ = get_db_tables()
+        if table_name not in tables:
+            return None, f"Table '{table_name}' not found in database"
+        
         conn = sqlite3.connect(DB_PATH)
-        df = pd.read_sql_query(f"SELECT * FROM {table_name} LIMIT 5000", conn)
+        # Use parameterized query with quoted identifier
+        df = pd.read_sql_query(f'SELECT * FROM "{table_name}" LIMIT 5000', conn)
         conn.close()
         return df, None
     except Exception as e:

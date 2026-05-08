@@ -3,4 +3,5 @@ __pycache__/
 
 Data/*.db
 
-models/
+.venv/
+*.env

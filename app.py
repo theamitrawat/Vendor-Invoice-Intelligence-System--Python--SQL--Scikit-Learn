@@ -5,6 +5,7 @@ import sqlite3
 import joblib
 import os
 import warnings
+import requests
 from pathlib import Path
 from datetime import datetime
 
@@ -545,6 +546,41 @@ MODEL_FREIGHT_PATH = BASE_DIR / "models" / "predict_freight_model.pkl"
 MODEL_FLAG_PATH    = BASE_DIR / "models" / "predict_flag_invoice.pkl"
 SCALER_PATH        = BASE_DIR / "models" / "scaler.pkl"
 RESULTS_CSV_PATH   = BASE_DIR / "models" / "model_results.csv"
+
+# =============================================================================
+# DB AUTO-DOWNLOAD (for Streamlit Cloud deployment)
+# Replace the URL below with your actual GitHub Release asset URL after upload
+# =============================================================================
+
+DB_DOWNLOAD_URL = "https://github.com/theamitrawat/Vendor-Invoice-Intelligence-System--Python--SQL--Scikit-Learn/releases/download/v1.0/inventory.db"
+
+@st.cache_resource(show_spinner=False)
+def ensure_database():
+    """
+    Download inventory.db from GitHub Releases if not present locally.
+    This runs once on startup (cached). Required for Streamlit Cloud deployment.
+    """
+    if DB_PATH.exists():
+        return True, None
+
+    try:
+        DB_PATH.parent.mkdir(parents=True, exist_ok=True)
+        with st.spinner("⏳ Downloading database... (first run only, ~400 MB)"):
+            response = requests.get(DB_DOWNLOAD_URL, stream=True, timeout=300)
+            response.raise_for_status()
+            with open(DB_PATH, "wb") as f:
+                for chunk in response.iter_content(chunk_size=8192):
+                    f.write(chunk)
+        return True, None
+    except Exception as e:
+        return False, str(e)
+
+# Trigger DB download at startup
+_db_ready, _db_err = ensure_database()
+if not _db_ready:
+    st.error(f"⚠️ Database could not be loaded: {_db_err}")
+    st.info("Please check the DB_DOWNLOAD_URL in app.py and ensure the GitHub Release asset is publicly accessible.")
+
 
 # =============================================================================
 # SESSION STATE INIT
